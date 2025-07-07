@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
 import pool from '@/lib/db';
 
-export async function PUT(request: Request, { params }: { params: { id: string } }) {
+export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const { content } = await request.json();
     const { rows } = await pool.query(
       'UPDATE notes SET content = $1 WHERE id = $2 RETURNING *',
@@ -15,9 +15,9 @@ export async function PUT(request: Request, { params }: { params: { id: string }
   }
 }
 
-export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const { id } = params;
+    const { id } = await params;
     await pool.query('DELETE FROM notes WHERE id = $1', [id]);
     return new NextResponse(null, { status: 204 });
   } catch (error) {
